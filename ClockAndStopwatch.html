@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 12: Stopwatch & Clock</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a3a, #0c1825);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(25, 35, 50, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            color: #a0c8ff;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+        
+        .clock-section, .stopwatch-section {
+            flex: 1 1 400px;
+            background: rgba(15, 25, 40, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .section-title {
+            font-size: clamp(1.3rem, 3vw, 1.5rem);
+            margin-bottom: 20px;
+            color: #66b3ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-size: 1.3rem;
+        }
+        
+        .clock-display {
+            font-size: clamp(2rem, 7vw, 3.5rem);
+            text-align: center;
+            font-weight: 700;
+            background: rgba(0, 30, 60, 0.4);
+            border-radius: 10px;
+            padding: 15px 10px;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(100, 180, 255, 0.2);
+            font-family: 'Courier New', monospace;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .date-display {
+            text-align: center;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: #a0c8ff;
+            margin-bottom: 25px;
+            padding: 0 5px;
+        }
+        
+        .stopwatch-display {
+            font-size: clamp(2.2rem, 7vw, 4rem);
+            text-align: center;
+            font-weight: 700;
+            background: rgba(0, 30, 60, 0.4);
+            border-radius: 10px;
+            padding: 15px 10px;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(100, 180, 255, 0.2);
+            font-family: 'Courier New', monospace;
+            word-break: break-word;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            min-width: 110px;
+            flex: 1 1 120px;
+        }
+        
+        .btn-start {
+            background: linear-gradient(90deg, #00b09b, #96c93d);
+            color: white;
+        }
+        
+        .btn-stop {
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(90deg, #8e9eab, #eef2f3);
+            color: #333;
+        }
+        
+        .btn-lap {
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn i {
+            font-size: 1rem;
+        }
+        
+        .laps-container {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 10px;
+            background: rgba(0, 20, 40, 0.5);
+            padding: 12px;
+        }
+        
+        .laps-title {
+            font-size: clamp(1.1rem, 2.5vw, 1.2rem);
+            margin-bottom: 10px;
+            color: #66b3ff;
+        }
+        
+        .lap-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+        }
+        
+        .lap-item:last-child {
+            border-bottom: none;
+        }
+        
+        .lap-number {
+            color: #a0c8ff;
+        }
+        
+        .lap-time {
+            font-weight: 600;
+        }
+        
+        .lap-item:nth-child(odd) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            color: #a0c8ff;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            padding: 0 10px;
+        }
+        
+        .timezone-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        select {
+            background: rgba(0, 30, 60, 0.8);
+            color: white;
+            border: 1px solid rgba(100, 180, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        /* Extra small devices (phones, less than 576px) */
+        @media (max-width: 575.98px) {
+            .container {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            .clock-section, .stopwatch-section {
+                padding: 15px;
+                flex: 1 1 100%;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                min-width: 90px;
+                flex: 1 1 90px;
+            }
+            
+            .controls {
+                gap: 8px;
+            }
+            
+            .clock-display, .stopwatch-display {
+                padding: 12px 8px;
+                letter-spacing: 0.5px;
+            }
+            
+            .laps-container {
+                max-height: 150px;
+            }
+        }
+        
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .app-container {
+                gap: 20px;
+            }
+            
+            .clock-section, .stopwatch-section {
+                flex: 1 1 100%;
+            }
+            
+            .btn {
+                flex: 1 1 100px;
+            }
+        }
+        
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .app-container {
+                gap: 20px;
+            }
+            
+            .clock-section, .stopwatch-section {
+                flex: 1 1 calc(50% - 20px);
+            }
+            
+            .clock-display, .stopwatch-display {
+                font-size: clamp(2.2rem, 4vw, 2.8rem);
+            }
+        }
+        
+        /* Large devices (desktops, 992px and up) */
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .app-container {
+                gap: 25px;
+            }
+            
+            .clock-section, .stopwatch-section {
+                flex: 1 1 calc(50% - 25px);
+            }
+        }
+        
+        /* Extra large devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            .app-container {
+                gap: 30px;
+            }
+            
+            .clock-section, .stopwatch-section {
+                flex: 1 1 calc(50% - 30px);
+            }
+        }
+        
+        /* Mobile orientation adjustments */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+            }
+            
+            .container {
+                margin: 10px 0;
+            }
+            
+            .app-container {
+                flex-direction: row;
+            }
+            
+            .laps-container {
+                max-height: 120px;
+            }
+            
+            .clock-display, .stopwatch-display {
+                font-size: 2rem;
+                padding: 10px;
+            }
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .clock-section, .stopwatch-section {
+                background: #0a1520;
+                border: 2px solid #fff;
+            }
+            
+            .btn {
+                border: 1px solid #fff;
+            }
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .btn {
+                transition: none;
+            }
+            
+            .btn:hover {
+                transform: none;
+            }
+        }
+        
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .btn {
+                min-height: 44px; /* Minimum touch target size */
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-clock"></i> Stopwatch & Clock</h1>
+            <p class="subtitle">A combined application featuring a real-time digital clock and a precision stopwatch with lap recording capabilities.</p>
+        </header>
+        
+        <div class="app-container">
+            <!-- Clock Section -->
+            <section class="clock-section">
+                <h2 class="section-title"><i class="far fa-clock"></i> Digital Clock</h2>
+                
+                <div class="timezone-selector">
+                    <select id="timezone">
+                        <option value="local">Local Time</option>
+                        <option value="utc">UTC/GMT</option>
+                        <option value="est">Eastern Time (ET)</option>
+                        <option value="pst">Pacific Time (PT)</option>
+                        <option value="cet">Central European Time (CET)</option>
+                        <option value="aest">Australian Eastern Time (AEST)</option>
+                    </select>
+                </div>
+                
+                <div class="clock-display" id="clock">00:00:00</div>
+                <div class="date-display" id="date">Monday, January 1, 2023</div>
+                
+                <div class="controls">
+                    <button class="btn btn-start" id="toggleFormat">
+                        <i class="fas fa-exchange-alt"></i> 12-Hour Format
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Stopwatch Section -->
+            <section class="stopwatch-section">
+                <h2 class="section-title"><i class="fas fa-stopwatch"></i> Stopwatch</h2>
+                
+                <div class="stopwatch-display" id="stopwatch">00:00:00.00</div>
+                
+                <div class="controls">
+                    <button class="btn btn-start" id="startBtn">
+                        <i class="fas fa-play"></i> Start
+                    </button>
+                    <button class="btn btn-stop" id="stopBtn" disabled>
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <button class="btn btn-reset" id="resetBtn" disabled>
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    <button class="btn btn-lap" id="lapBtn" disabled>
+                        <i class="fas fa-flag"></i> Lap
+                    </button>
+                </div>
+                
+                <div class="laps-container">
+                    <h3 class="laps-title">Lap Times</h3>
+                    <div id="lapsList">
+                        <!-- Lap times will appear here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="footer">
+            <p>Project 12: Stopwatch & Clock Application | Combines real-time clock with precision stopwatch functionality</p>
+        </footer>
+    </div>
+
+    <script>
+        // Clock functionality
+        const clockElement = document.getElementById('clock');
+        const dateElement = document.getElementById('date');
+        const timezoneSelect = document.getElementById('timezone');
+        const toggleFormatBtn = document.getElementById('toggleFormat');
+        
+        let is12HourFormat = false;
+        let selectedTimezone = 'local';
+        
+        // Stopwatch functionality
+        const stopwatchElement = document.getElementById('stopwatch');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const lapBtn = document.getElementById('lapBtn');
+        const lapsList = document.getElementById('lapsList');
+        
+        let stopwatchInterval;
+        let stopwatchRunning = false;
+        let stopwatchStartTime = 0;
+        let stopwatchElapsedTime = 0;
+        let lapCounter = 1;
+        
+        // Responsive font size adjustment for stopwatch
+        function adjustStopwatchFontSize() {
+            const stopwatchText = stopwatchElement.textContent;
+            const containerWidth = stopwatchElement.offsetWidth;
+            const textLength = stopwatchText.length;
+            
+            // Adjust font size based on container width and text length
+            if (containerWidth < 300 && textLength > 10) {
+                stopwatchElement.style.fontSize = 'clamp(1.8rem, 5vw, 2.5rem)';
+            } else if (containerWidth < 400) {
+                stopwatchElement.style.fontSize = 'clamp(2rem, 6vw, 3rem)';
+            } else {
+                stopwatchElement.style.fontSize = 'clamp(2.2rem, 7vw, 4rem)';
+            }
+        }
+        
+        // Clock functions
+        function updateClock() {
+            const now = new Date();
+            let displayTime = now;
+            
+            // Adjust for selected timezone
+            switch(selectedTimezone) {
+                case 'utc':
+                    displayTime = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+                    break;
+                case 'est':
+                    displayTime = new Date(now.getTime() - 5 * 3600000);
+                    break;
+                case 'pst':
+                    displayTime = new Date(now.getTime() - 8 * 3600000);
+                    break;
+                case 'cet':
+                    displayTime = new Date(now.getTime() + 1 * 3600000);
+                    break;
+                case 'aest':
+                    displayTime = new Date(now.getTime() + 10 * 3600000);
+                    break;
+                default:
+                    // local time - no adjustment needed
+            }
+            
+            let hours = displayTime.getHours();
+            const minutes = displayTime.getMinutes().toString().padStart(2, '0');
+            const seconds = displayTime.getSeconds().toString().padStart(2, '0');
+            
+            // Format hours for 12-hour format if selected
+            let amPm = '';
+            if (is12HourFormat) {
+                amPm = hours >= 12 ? ' PM' : ' AM';
+                hours = hours % 12 || 12;
+            }
+            
+            hours = hours.toString().padStart(2, '0');
+            
+            const timeString = is12HourFormat 
+                ? `${hours}:${minutes}:${seconds}${amPm}` 
+                : `${hours}:${minutes}:${seconds}`;
+            
+            clockElement.textContent = timeString;
+            
+            // Adjust clock font size for small screens
+            const clockContainerWidth = clockElement.offsetWidth;
+            if (clockContainerWidth < 250) {
+                clockElement.style.fontSize = 'clamp(1.5rem, 5vw, 2rem)';
+            } else if (clockContainerWidth < 350) {
+                clockElement.style.fontSize = 'clamp(1.8rem, 6vw, 2.5rem)';
+            }
+            
+            // Update date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = displayTime.toLocaleDateString(undefined, options);
+        }
+        
+        // Stopwatch functions
+        function formatStopwatchTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const milliseconds = Math.floor((ms % 1000) / 10);
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
+        }
+        
+        function updateStopwatch() {
+            const currentTime = Date.now();
+            const elapsed = currentTime - stopwatchStartTime + stopwatchElapsedTime;
+            stopwatchElement.textContent = formatStopwatchTime(elapsed);
+            adjustStopwatchFontSize();
+        }
+        
+        function startStopwatch() {
+            if (!stopwatchRunning) {
+                stopwatchStartTime = Date.now();
+                stopwatchInterval = setInterval(updateStopwatch, 10);
+                stopwatchRunning = true;
+                
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                resetBtn.disabled = false;
+                lapBtn.disabled = false;
+                
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Running';
+            }
+        }
+        
+        function stopStopwatch() {
+            if (stopwatchRunning) {
+                clearInterval(stopwatchInterval);
+                const currentTime = Date.now();
+                stopwatchElapsedTime += currentTime - stopwatchStartTime;
+                stopwatchRunning = false;
+                
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+            }
+        }
+        
+        function resetStopwatch() {
+            clearInterval(stopwatchInterval);
+            stopwatchRunning = false;
+            stopwatchStartTime = 0;
+            stopwatchElapsedTime = 0;
+            lapCounter = 1;
+            
+            stopwatchElement.textContent = '00:00:00.00';
+            lapsList.innerHTML = '';
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            resetBtn.disabled = true;
+            lapBtn.disabled = true;
+            
+            startBtn.innerHTML = '<i class="fas fa-play"></i> Start';
+            adjustStopwatchFontSize();
+        }
+        
+        function recordLap() {
+            if (stopwatchRunning) {
+                const currentTime = Date.now();
+                const elapsed = currentTime - stopwatchStartTime + stopwatchElapsedTime;
+                
+                const lapItem = document.createElement('div');
+                lapItem.className = 'lap-item';
+                lapItem.innerHTML = `
+                    <span class="lap-number">Lap ${lapCounter}</span>
+                    <span class="lap-time">${formatStopwatchTime(elapsed)}</span>
+                `;
+                
+                // Add new lap at the top
+                if (lapsList.firstChild) {
+                    lapsList.insertBefore(lapItem, lapsList.firstChild);
+                } else {
+                    lapsList.appendChild(lapItem);
+                }
+                
+                lapCounter++;
+                
+                // Scroll to show new lap
+                lapsList.scrollTop = 0;
+            }
+        }
+        
+        // Event listeners for clock
+        timezoneSelect.addEventListener('change', () => {
+            selectedTimezone = timezoneSelect.value;
+            updateClock();
+        });
+        
+        toggleFormatBtn.addEventListener('click', () => {
+            is12HourFormat = !is12HourFormat;
+            toggleFormatBtn.innerHTML = is12HourFormat 
+                ? '<i class="fas fa-exchange-alt"></i> 24-Hour Format' 
+                : '<i class="fas fa-exchange-alt"></i> 12-Hour Format';
+            updateClock();
+        });
+        
+        // Event listeners for stopwatch
+        startBtn.addEventListener('click', startStopwatch);
+        stopBtn.addEventListener('click', stopStopwatch);
+        resetBtn.addEventListener('click', resetStopwatch);
+        lapBtn.addEventListener('click', recordLap);
+        
+        // Initialize the application
+        updateClock();
+        adjustStopwatchFontSize();
+        setInterval(updateClock, 1000);
+        
+        // Add keyboard shortcuts (disabled on touch devices)
+        function isTouchDevice() {
+            return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        }
+        
+        if (!isTouchDevice()) {
+            document.addEventListener('keydown', (e) => {
+                // Space to start/stop stopwatch
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    if (stopwatchRunning) {
+                        stopStopwatch();
+                    } else {
+                        startStopwatch();
+                    }
+                }
+                
+                // L key to record lap
+                if (e.code === 'KeyL' && stopwatchRunning) {
+                    recordLap();
+                }
+                
+                // R key to reset stopwatch
+                if (e.code === 'KeyR' && !stopwatchRunning && stopwatchElapsedTime > 0) {
+                    resetStopwatch();
+                }
+            });
+        }
+        
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            updateClock();
+            adjustStopwatchFontSize();
+        });
+        
+        // Add some initial instructions in the lap container
+        lapsList.innerHTML = `
+            <div class="lap-item">
+                <span class="lap-number">Instructions</span>
+                <span class="lap-time">Click "Lap" to record</span>
+            </div>
+            <div class="lap-item">
+                <span class="lap-number">Keyboard Shortcuts</span>
+                <span class="lap-time">Space: Start/Stop</span>
+            </div>
+            <div class="lap-item">
+                <span class="lap-number"></span>
+                <span class="lap-time">L: Lap | R: Reset</span>
+            </div>
+        `;
+        
+        // Touch device optimization - adjust button sizes
+        if (isTouchDevice()) {
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.style.minHeight = '44px';
+                button.style.padding = '12px 16px';
+            });
+        }
+    </script>
+</body>
+</html>
